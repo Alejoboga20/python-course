@@ -8,6 +8,10 @@ print(2.0 + 3.0)
 print(type(2.0))
 print(type(2 + 3.0))  # The result is a float
 
+# Complex numbers
+print(2 + 3j)
+print(type(2 + 3j))
+
 # Arithmetic operations
 print(2 + 3)  # Addition
 print(2 - 3)  # Subtraction
@@ -21,3 +25,5 @@ print(5 % 3)  # Modulus
 print(round(3.14159))  # Round to the nearest whole number
 print(round(3.14159, 2))  # Round to 2 decimal places
 print(abs(-3.14159))  # Absolute value
+print(bin(5))  # Binary representation of a number
+print(int('101', 2))  # Convert binary to integer
