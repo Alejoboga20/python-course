@@ -27,3 +27,8 @@ print(round(3.14159, 2))  # Round to 2 decimal places
 print(abs(-3.14159))  # Absolute value
 print(bin(5))  # Binary representation of a number
 print(int('101', 2))  # Convert binary to integer
+
+# augmeneted assignment operators
+x = 2
+x += 3  # x = x + 3
+print(x)
