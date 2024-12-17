@@ -57,8 +57,17 @@ print(f"Full name: {full_name}")
 age = 25
 str_age = str(age)
 print(type(str_age))
-print(f"Age: {str_age}")
 
 # Escape sequences (\n, \t, \", \', \\)
 weather = "\t It's \"kind of\" \nsunny"
 print(weather)
+
+# Formatted strings: f-strings
+name = "John"
+age = 25
+greeting = f"Hello, my name is {name} and I'm {age} years old"
+print(greeting)
+
+alternative_greeting = "Hello, my name is {} and I'm {} years old".format(
+    name, age)
+print(alternative_greeting)
