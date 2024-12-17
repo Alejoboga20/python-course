@@ -1,4 +1,7 @@
-# Numbers: We can perform arithmetic operations on numbers
+""" Data types in Python """
+""" Python is a dynamically typed language, meaning that the type of a variable is determined at runtime """
+
+""" Numbers: Integers, Floats, Complex numbers. We can perform arithmetic operations on numbers """
 # Integers: Whole numbers
 print(2 + 3)
 print(type(2))
@@ -32,3 +35,20 @@ print(int('101', 2))  # Convert binary to integer
 x = 2
 x += 3  # x = x + 3
 print(x)
+
+""" Strings: strings are sequences of characters enclosed in quotes"""
+greet = "Hello, World!"
+print(type(greet))
+
+username = "john_doe"
+password = "password123"
+long_string = """
+    This is a long string
+    that spans multiple lines
+  """
+
+# String concatenation
+first_name = "John"
+last_name = "Doe"
+full_name = first_name + last_name
+print(f"Full name: {full_name}")
