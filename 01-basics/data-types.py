@@ -58,3 +58,7 @@ age = 25
 str_age = str(age)
 print(type(str_age))
 print(f"Age: {str_age}")
+
+# Escape sequences (\n, \t, \", \', \\)
+weather = "\t It's \"kind of\" \nsunny"
+print(weather)
