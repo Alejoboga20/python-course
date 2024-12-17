@@ -52,3 +52,9 @@ first_name = "John"
 last_name = "Doe"
 full_name = first_name + last_name
 print(f"Full name: {full_name}")
+
+# Type conversion
+age = 25
+str_age = str(age)
+print(type(str_age))
+print(f"Age: {str_age}")
