@@ -71,3 +71,10 @@ print(greeting)
 alternative_greeting = "Hello, my name is {} and I'm {} years old".format(
     name, age)
 print(alternative_greeting)
+
+# String indexes
+print(name[0])  # First character
+print(name[-1])  # Last character
+print(name[0:2])  # Slicing
+print(greeting[0:5:2])  # Slicing with step
+print(greeting[::2])  # Slicing with step
