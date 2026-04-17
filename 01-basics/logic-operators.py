@@ -17,3 +17,7 @@ if not licensed:
     print("No license")
 else:
     print("Has license")
+    
+# Short Circuiting
+name = None
+print(name and name.upper())
