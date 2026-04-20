@@ -19,11 +19,9 @@ def home():
 @app.get("/posts")
 def list_posts(title: str | None = Query(default=None, description="Text to search by title")):
     if title:
-        posts = []
-
-        for post in BLOG_POSTS:
-            if title.lower() in post["title"].lower():
-                posts.append(post)
+        posts = [
+            post for post in BLOG_POSTS if title.lower() in post["title"].lower()
+        ]
 
         return {"data": posts, "query": {"title": title}}
 
