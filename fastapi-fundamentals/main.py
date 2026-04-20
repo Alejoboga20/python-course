@@ -58,3 +58,17 @@ def create_post(post: dict = Body(...)):
     BLOG_POSTS.append(new_post)
 
     return {"data": new_post, "message": "new post created"}
+
+
+@app.put("/posts/{post_id}")
+def update_post(post_id: int, data: dict = Body(...)):
+
+    for post in BLOG_POSTS:
+        if post_id == post["id"]:
+            if "title" in data:
+                post["title"] = data["title"]
+            if "content" in data:
+                post["content"] = data["content"]
+            return {"message": "Post updated", "data": post}
+
+    raise HTTPException(status_code=404, detail="Post not found")
