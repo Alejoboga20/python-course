@@ -1,8 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 
 app = FastAPI(title="FastAPI Fundamentals")
 
-BLOG_POST = [
+BLOG_POSTS = [
     {"id": 1, "title": "Hello from FastAPI",
         "description": "First App using FastAPI"},
     {"id": 2, "title": "Hello from NestJS",
@@ -17,5 +17,14 @@ def home():
 
 
 @app.get("/posts")
-def list_posts():
-    return {"data": BLOG_POST}
+def list_posts(title: str | None = Query(default=None, description="Text to search by title")):
+    if title:
+        posts = []
+
+        for post in BLOG_POSTS:
+            if title.lower() in post["title"].lower():
+                posts.append(post)
+
+        return {"data": posts, "query": {"title": title}}
+
+    return {"data": BLOG_POSTS}

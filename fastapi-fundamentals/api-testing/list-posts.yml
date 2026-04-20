@@ -6,6 +6,11 @@ info:
 http:
   method: GET
   url: "{{base_url}}/posts"
+  params:
+    - name: title
+      value: fastapi
+      type: query
+      disabled: true
   auth: inherit
 
 settings:
