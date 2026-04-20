@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 
 app = FastAPI(title="FastAPI Fundamentals")
 
@@ -26,3 +26,12 @@ def list_posts(title: str | None = Query(default=None, description="Text to sear
         return {"data": posts, "query": {"title": title}}
 
     return {"data": BLOG_POSTS}
+
+
+@app.get("/posts/{post_id}")
+def get_post(post_id: int):
+    for post in BLOG_POSTS:
+        if post["id"] == post_id:
+            return {"data": post}
+
+    raise HTTPException(status_code=404, detail="Post not found")
