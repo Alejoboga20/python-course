@@ -29,9 +29,13 @@ def list_posts(title: str | None = Query(default=None, description="Text to sear
 
 
 @app.get("/posts/{post_id}")
-def get_post(post_id: int):
+def get_post(post_id: int, include_content: bool = Query(default=False, description="Include content of the post")):
     for post in BLOG_POSTS:
         if post["id"] == post_id:
+            if not include_content:
+                post = post.copy()
+                post.pop("description")
+
             return {"data": post}
 
     raise HTTPException(status_code=404, detail="Post not found")

@@ -5,12 +5,15 @@ info:
 
 http:
   method: GET
-  url: "{{base_url}}/posts/20"
+  url: "{{base_url}}/posts/1?include_content=true"
   params:
     - name: title
       value: fastapi
       type: query
       disabled: true
+    - name: include_content
+      value: "true"
+      type: query
   auth: inherit
 
 settings:
