@@ -1,13 +1,13 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, Body, HTTPException
 
 app = FastAPI(title="FastAPI Fundamentals")
 
 BLOG_POSTS = [
     {"id": 1, "title": "Hello from FastAPI",
-        "description": "First App using FastAPI"},
+        "content": "First App using FastAPI"},
     {"id": 2, "title": "Hello from NestJS",
-        "description": "First App using NestJS"},
-    {"id": 3, "title": "Hello from Rails", "description": "First App using Rails"},
+        "content": "First App using NestJS"},
+    {"id": 3, "title": "Hello from Rails", "content": "First App using Rails"},
 ]
 
 
@@ -34,8 +34,27 @@ def get_post(post_id: int, include_content: bool = Query(default=False, descript
         if post["id"] == post_id:
             if not include_content:
                 post = post.copy()
-                post.pop("description")
+                post.pop("content")
 
             return {"data": post}
 
     raise HTTPException(status_code=404, detail="Post not found")
+
+
+@app.post("/posts")
+def create_post(post: dict = Body(...)):
+    if "title" not in post or "content" not in post:
+        raise HTTPException(
+            status_code=404, detail="Title and Content are required")
+
+    if not str(post["title"]).strip():
+        raise HTTPException(
+            status_code=404, detail="Title should not be empty")
+
+    new_id = (BLOG_POSTS[-1]["id"] + 1) if BLOG_POSTS else 1
+    new_post = {"id": new_id,
+                "title": post["title"], "content": post["content"]}
+
+    BLOG_POSTS.append(new_post)
+
+    return {"data": new_post, "message": "new post created"}
