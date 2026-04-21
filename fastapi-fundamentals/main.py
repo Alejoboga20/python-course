@@ -1,7 +1,24 @@
 from http import HTTPStatus
+
 from fastapi import FastAPI, Query, Body, HTTPException
+from pydantic import BaseModel
 
 app = FastAPI(title="FastAPI Fundamentals")
+
+
+class PostBase(BaseModel):
+    title: str
+    content: str
+
+
+class PostCreate(PostBase):
+    pass
+
+
+class PostUpdate(BaseModel):
+    title: str
+    content: str
+
 
 BLOG_POSTS = [
     {"id": 1, "title": "Hello from FastAPI",
@@ -44,18 +61,10 @@ def get_post(post_id: int, include_content: bool = Query(default=False, descript
 
 
 @app.post("/posts")
-def create_post(post: dict = Body(...)):
-    if "title" not in post or "content" not in post:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="Title and Content are required")
-
-    if not str(post["title"]).strip():
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail="Title should not be empty")
-
+def create_post(post: PostCreate):
     new_id = (BLOG_POSTS[-1]["id"] + 1) if BLOG_POSTS else 1
     new_post = {"id": new_id,
-                "title": post["title"], "content": post["content"]}
+                "title": post.title, "content": post.content}
 
     BLOG_POSTS.append(new_post)
 
@@ -63,14 +72,16 @@ def create_post(post: dict = Body(...)):
 
 
 @app.put("/posts/{post_id}")
-def update_post(post_id: int, data: dict = Body(...)):
+def update_post(post_id: int, data: PostUpdate):
 
     for post in BLOG_POSTS:
         if post_id == post["id"]:
-            if "title" in data:
-                post["title"] = data["title"]
-            if "content" in data:
-                post["content"] = data["content"]
+            payload = data.model_dump(exclude_unset=True)
+
+            if "title" in payload:
+                post["title"] = payload["title"]
+            if "content" in payload:
+                post["content"] = payload["content"]
             return {"message": "Post updated", "data": post}
 
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND,
