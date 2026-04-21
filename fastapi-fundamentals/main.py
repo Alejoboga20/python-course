@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from fastapi import FastAPI, Query, Body, HTTPException
 
 app = FastAPI(title="FastAPI Fundamentals")
@@ -38,18 +39,19 @@ def get_post(post_id: int, include_content: bool = Query(default=False, descript
 
             return {"data": post}
 
-    raise HTTPException(status_code=404, detail="Post not found")
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND,
+                        detail="Post not found")
 
 
 @app.post("/posts")
 def create_post(post: dict = Body(...)):
     if "title" not in post or "content" not in post:
         raise HTTPException(
-            status_code=404, detail="Title and Content are required")
+            status_code=HTTPStatus.NOT_FOUND, detail="Title and Content are required")
 
     if not str(post["title"]).strip():
         raise HTTPException(
-            status_code=404, detail="Title should not be empty")
+            status_code=HTTPStatus.NOT_FOUND, detail="Title should not be empty")
 
     new_id = (BLOG_POSTS[-1]["id"] + 1) if BLOG_POSTS else 1
     new_post = {"id": new_id,
@@ -71,4 +73,16 @@ def update_post(post_id: int, data: dict = Body(...)):
                 post["content"] = data["content"]
             return {"message": "Post updated", "data": post}
 
-    raise HTTPException(status_code=404, detail="Post not found")
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND,
+                        detail="Post not found")
+
+
+@app.delete("/posts/{post_id}", status_code=HTTPStatus.NO_CONTENT)
+def delete_post(post_id: int):
+    for index, post in enumerate(BLOG_POSTS):
+        if post["id"] == post_id:
+            BLOG_POSTS.pop(index)
+
+            return
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND,
+                        detail="Post not found")
