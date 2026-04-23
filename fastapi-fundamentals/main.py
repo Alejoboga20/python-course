@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from typing import Optional
 from fastapi import FastAPI, Query, Body, HTTPException
 from pydantic import BaseModel
 
@@ -8,7 +9,7 @@ app = FastAPI(title="FastAPI Fundamentals")
 
 class PostBase(BaseModel):
     title: str
-    content: str
+    content: Optional[str] = None
 
 
 class PostCreate(PostBase):
@@ -16,8 +17,8 @@ class PostCreate(PostBase):
 
 
 class PostUpdate(BaseModel):
-    title: str
-    content: str
+    title: Optional[str] = None
+    content: Optional[str] = None
 
 
 BLOG_POSTS = [
