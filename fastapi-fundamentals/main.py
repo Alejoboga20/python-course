@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
 from typing import Optional
-from fastapi import FastAPI, Query, Body, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, Query, HTTPException
+from pydantic import BaseModel, Field
 
 app = FastAPI(title="FastAPI Fundamentals")
 
@@ -12,8 +12,11 @@ class PostBase(BaseModel):
     content: Optional[str] = None
 
 
-class PostCreate(PostBase):
-    pass
+class PostCreate(BaseModel):
+    title: str = Field(..., min_length=5, max_length=50,
+                       description="Post Titlte", example="First Post")
+    content: Optional[str] = Field(
+        min_length=0, max_length=1000, default="", example="This is a content")
 
 
 class PostUpdate(BaseModel):
