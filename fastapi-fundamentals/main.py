@@ -1,8 +1,8 @@
 from http import HTTPStatus
-
 from typing import Optional
+
 from fastapi import FastAPI, Query, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 app = FastAPI(title="FastAPI Fundamentals")
 
@@ -17,6 +17,14 @@ class PostCreate(BaseModel):
                        description="Post Titlte", example="First Post")
     content: Optional[str] = Field(
         min_length=0, max_length=1000, default="", example="This is a content")
+
+    @field_validator("title")
+    @classmethod
+    def not_allowed_title(cls, value: str) -> str:
+        if "spam" in value.lower():
+            raise ValueError("Title can not contain word: spam")
+
+        return value
 
 
 class PostUpdate(BaseModel):
