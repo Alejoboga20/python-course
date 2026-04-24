@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel, Field, field_validator
@@ -27,12 +27,21 @@ class PostCreate(BaseModel):
         return value
 
 
+class PostPublic(PostBase):
+    id: int
+
+
+class PostSummary(BaseModel):
+    id: int
+    title: str
+
+
 class PostUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
 
 
-BLOG_POSTS = [
+BLOG_POSTS: List[PostPublic] = [
     {"id": 1, "title": "Hello from FastAPI",
         "content": "First App using FastAPI"},
     {"id": 2, "title": "Hello from NestJS",
@@ -46,16 +55,16 @@ def home():
     return {'message': "Hello FastAPI", 'ok': True}
 
 
-@app.get("/posts")
+@app.get("/posts", response_model=List[PostPublic])
 def list_posts(title: str | None = Query(default=None, description="Text to search by title")):
     if title:
-        posts = [
+        public_posts: List[PostPublic] = [
             post for post in BLOG_POSTS if title.lower() in post["title"].lower()
         ]
 
-        return {"data": posts, "query": {"title": title}}
+        return public_posts
 
-    return {"data": BLOG_POSTS}
+    return BLOG_POSTS
 
 
 @app.get("/posts/{post_id}")
