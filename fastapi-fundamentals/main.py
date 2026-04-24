@@ -11,9 +11,14 @@ class Tag(BaseModel):
     name: str = Field(..., min_length=2, max_length=20, description="Tag")
 
 
+class Author(BaseModel):
+    name: str = Field(..., min_length=3, max_length=20, description="Author")
+
+
 class PostBase(BaseModel):
     title: str
     content: Optional[str] = None
+    author: Author
     tags: Optional[List[Tag]] = []
 
 
@@ -29,6 +34,10 @@ class PostCreate(BaseModel):
         min_length=0,
         max_length=1000,
         json_schema_extra={"example": "This is a content"},
+    )
+    author: Author = Field(
+        ...,
+        json_schema_extra={"example": "Author of the post"},
     )
     tags: list[Tag] = Field(default_factory=list)
 
@@ -57,11 +66,11 @@ class PostUpdate(BaseModel):
 
 BLOG_POSTS: List[PostPublic] = [
     PostPublic(id=1, title="Hello from FastAPI",
-               content="First App using FastAPI"),
+               content="First App using FastAPI", author=Author(name="Alejo")),
     PostPublic(id=2, title="Hello from NestJS",
-               content="First App using NestJS"),
+               content="First App using NestJS", author=Author(name="Daniel")),
     PostPublic(id=3, title="Hello from Rails",
-               content="First App using Rails"),
+               content="First App using Rails", author=Author(name="Boga")),
 ]
 
 
@@ -98,8 +107,10 @@ def get_post(post_id: int, include_content: bool = Query(default=False, descript
 @app.post("/posts")
 def create_post(post: PostCreate):
     new_id = (BLOG_POSTS[-1].id + 1) if BLOG_POSTS else 1
-    new_post = PostPublic(id=new_id, title=post.title, content=post.content, tags=[
-                          Tag(name=tag.name) for tag in post.tags])
+    new_post = PostPublic(id=new_id, title=post.title, content=post.content,
+                          author=Author(name=post.author.name),
+                          tags=[
+                              Tag(name=tag.name) for tag in post.tags])
 
     BLOG_POSTS.append(new_post)
 

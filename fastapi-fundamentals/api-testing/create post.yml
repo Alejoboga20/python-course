@@ -12,6 +12,7 @@ http:
       {
           "title": "test title",
           "content": "test content",
+          "author": {"name": "author test"},
           "tags": [{"name": "test"}, {"name": "tag"}]
       }
   auth: inherit
