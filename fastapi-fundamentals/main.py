@@ -7,9 +7,14 @@ from pydantic import BaseModel, Field, field_validator
 app = FastAPI(title="FastAPI Fundamentals")
 
 
+class Tag(BaseModel):
+    name: str = Field(..., min_length=2, max_length=20, description="Tag")
+
+
 class PostBase(BaseModel):
     title: str
     content: Optional[str] = None
+    tags: Optional[List[Tag]] = []
 
 
 class PostCreate(BaseModel):
@@ -25,6 +30,7 @@ class PostCreate(BaseModel):
         max_length=1000,
         json_schema_extra={"example": "This is a content"},
     )
+    tags: list[Tag] = Field(default_factory=list)
 
     @field_validator("title")
     @classmethod
@@ -92,7 +98,8 @@ def get_post(post_id: int, include_content: bool = Query(default=False, descript
 @app.post("/posts")
 def create_post(post: PostCreate):
     new_id = (BLOG_POSTS[-1].id + 1) if BLOG_POSTS else 1
-    new_post = PostPublic(id=new_id, title=post.title, content=post.content)
+    new_post = PostPublic(id=new_id, title=post.title, content=post.content, tags=[
+                          Tag(name=tag.name) for tag in post.tags])
 
     BLOG_POSTS.append(new_post)
 
