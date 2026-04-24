@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{base_url}}/posts/1?include_content=true"
+  url: "{{base_url}}/posts/2?include_content=true"
   params:
     - name: title
-      value: fastapi
+      value: rails
       type: query
       disabled: true
     - name: include_content

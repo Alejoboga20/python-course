@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel, Field, field_validator
@@ -13,10 +13,18 @@ class PostBase(BaseModel):
 
 
 class PostCreate(BaseModel):
-    title: str = Field(..., min_length=5, max_length=50,
-                       description="Post Titlte", example="First Post")
+    title: str = Field(
+        ...,
+        min_length=5, max_length=50,
+        description="Post Titlte",
+        json_schema_extra={"example": "This is a content"}
+    )
     content: Optional[str] = Field(
-        min_length=0, max_length=1000, default="", example="This is a content")
+        default="",
+        min_length=0,
+        max_length=1000,
+        json_schema_extra={"example": "This is a content"},
+    )
 
     @field_validator("title")
     @classmethod
@@ -42,11 +50,12 @@ class PostUpdate(BaseModel):
 
 
 BLOG_POSTS: List[PostPublic] = [
-    {"id": 1, "title": "Hello from FastAPI",
-        "content": "First App using FastAPI"},
-    {"id": 2, "title": "Hello from NestJS",
-        "content": "First App using NestJS"},
-    {"id": 3, "title": "Hello from Rails", "content": "First App using Rails"},
+    PostPublic(id=1, title="Hello from FastAPI",
+               content="First App using FastAPI"),
+    PostPublic(id=2, title="Hello from NestJS",
+               content="First App using NestJS"),
+    PostPublic(id=3, title="Hello from Rails",
+               content="First App using Rails"),
 ]
 
 
@@ -59,7 +68,7 @@ def home():
 def list_posts(title: str | None = Query(default=None, description="Text to search by title")):
     if title:
         public_posts: List[PostPublic] = [
-            post for post in BLOG_POSTS if title.lower() in post["title"].lower()
+            post for post in BLOG_POSTS if title.lower() in post.title.lower()
         ]
 
         return public_posts
@@ -67,15 +76,14 @@ def list_posts(title: str | None = Query(default=None, description="Text to sear
     return BLOG_POSTS
 
 
-@app.get("/posts/{post_id}")
+@app.get("/posts/{post_id}", response_model=Union[PostPublic, PostSummary])
 def get_post(post_id: int, include_content: bool = Query(default=False, description="Include content of the post")):
     for post in BLOG_POSTS:
-        if post["id"] == post_id:
+        if post.id == post_id:
             if not include_content:
-                post = post.copy()
-                post.pop("content")
-
-            return {"data": post}
+                post_summary = PostSummary(id=post.id, title=post.title)
+                return post_summary
+            return post
 
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND,
                         detail="Post not found")
@@ -83,9 +91,8 @@ def get_post(post_id: int, include_content: bool = Query(default=False, descript
 
 @app.post("/posts")
 def create_post(post: PostCreate):
-    new_id = (BLOG_POSTS[-1]["id"] + 1) if BLOG_POSTS else 1
-    new_post = {"id": new_id,
-                "title": post.title, "content": post.content}
+    new_id = (BLOG_POSTS[-1].id + 1) if BLOG_POSTS else 1
+    new_post = PostPublic(id=new_id, title=post.title, content=post.content)
 
     BLOG_POSTS.append(new_post)
 
@@ -96,13 +103,13 @@ def create_post(post: PostCreate):
 def update_post(post_id: int, data: PostUpdate):
 
     for post in BLOG_POSTS:
-        if post_id == post["id"]:
+        if post_id == post.id:
             payload = data.model_dump(exclude_unset=True)
 
             if "title" in payload:
-                post["title"] = payload["title"]
+                post.title = payload["title"]
             if "content" in payload:
-                post["content"] = payload["content"]
+                post.content = payload["content"]
             return {"message": "Post updated", "data": post}
 
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND,
@@ -112,7 +119,7 @@ def update_post(post_id: int, data: PostUpdate):
 @app.delete("/posts/{post_id}", status_code=HTTPStatus.NO_CONTENT)
 def delete_post(post_id: int):
     for index, post in enumerate(BLOG_POSTS):
-        if post["id"] == post_id:
+        if post.title == post_id:
             BLOG_POSTS.pop(index)
 
             return
