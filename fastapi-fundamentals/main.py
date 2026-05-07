@@ -80,7 +80,7 @@ def home():
 
 
 @app.get("/posts", response_model=List[PostPublic])
-def list_posts(title: str | None = Query(default=None, description="Text to search by title")):
+def list_posts(title: Optional[str] = Query(default=None, description="Text to search by title", alias="search")):
     if title:
         public_posts: List[PostPublic] = [
             post for post in BLOG_POSTS if title.lower() in post.title.lower()
