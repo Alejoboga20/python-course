@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import List, Optional, Union
 
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Path, Query, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
 app = FastAPI(title="FastAPI Fundamentals")
@@ -92,7 +92,8 @@ def list_posts(title: str | None = Query(default=None, description="Text to sear
 
 
 @app.get("/posts/{post_id}", response_model=Union[PostPublic, PostSummary])
-def get_post(post_id: int, include_content: bool = Query(default=False, description="Include content of the post")):
+def get_post(post_id: int = Path(..., ge=1, title="Post ID", description="Id must be grater than 1", example=1),
+             include_content: bool = Query(default=False, description="Include content of the post")):
     for post in BLOG_POSTS:
         if post.id == post_id:
             if not include_content:
