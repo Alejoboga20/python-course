@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Literal
 
 from fastapi import FastAPI, Path, Query, HTTPException
 from pydantic import BaseModel, Field, field_validator
@@ -80,21 +80,35 @@ def home():
 
 
 @app.get("/posts", response_model=List[PostPublic])
-def list_posts(title: Optional[str] = Query(
-    default=None,
-    description="Text to search by title",
-    alias="search",
-    min_length=5,
-    max_length=50
-)):
+def list_posts(title: Optional[str] = Query(default=None,
+                                            alias="search",
+                                            min_length=5,
+                                            max_length=50,
+                                            description="Text to search by title",
+                                            ),
+               limit: int = Query(default=10, ge=1, le=50,
+                                  description="Number of post to be returned"),
+               offset: int = Query(default=0, ge=0, le=50,
+                                   description="Amount of skipped posts"),
+               order_by: Literal["id", "title"] = Query(
+        default="title", description="Order by id or title"),
+        direction: Literal["asc", "desc"] = Query(default="asc")
+):
+
+    print(
+        f"title {title}, limit {limit}, offset {offset}, order_by {order_by}, direction {direction}")
+
+    results = BLOG_POSTS
+
     if title:
-        public_posts: List[PostPublic] = [
-            post for post in BLOG_POSTS if title.lower() in post.title.lower()
+        results: List[PostPublic] = [
+            post for post in results if title.lower() in post.title.lower()
         ]
 
-        return public_posts
+    results = sorted(
+        results, key=lambda post: post.id if order_by == "id" else post.title, reverse=(direction == "desc"))
 
-    return BLOG_POSTS
+    return results[offset: offset + limit]
 
 
 @app.get("/posts/{post_id}", response_model=Union[PostPublic, PostSummary])
