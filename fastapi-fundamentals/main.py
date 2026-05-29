@@ -81,7 +81,6 @@ def home():
 
 @app.get("/posts", response_model=List[PostPublic])
 def list_posts(title: Optional[str] = Query(default=None,
-                                            alias="search",
                                             min_length=5,
                                             max_length=50,
                                             description="Text to search by title",

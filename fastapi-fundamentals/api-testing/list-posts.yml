@@ -5,12 +5,27 @@ info:
 
 http:
   method: GET
-  url: "{{base_url}}/posts"
+  url: "{{base_url}}/posts?direction=asc"
   params:
     - name: title
       value: fastapi
       type: query
       disabled: true
+    - name: limit
+      value: "1"
+      type: query
+      disabled: true
+    - name: offset
+      value: "1"
+      type: query
+      disabled: true
+    - name: order_by
+      value: id
+      type: query
+      disabled: true
+    - name: direction
+      value: asc
+      type: query
   auth: inherit
 
 settings:
