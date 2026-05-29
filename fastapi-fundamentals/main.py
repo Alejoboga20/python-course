@@ -74,12 +74,19 @@ BLOG_POSTS: List[PostPublic] = [
 ]
 
 
+class PaginatedPost(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    items: List[PostPublic]
+
+
 @app.get("/")
 def home():
     return {'message': "Hello FastAPI", 'ok': True}
 
 
-@app.get("/posts", response_model=List[PostPublic])
+@app.get("/posts", response_model=PaginatedPost)
 def list_posts(title: Optional[str] = Query(default=None,
                                             min_length=5,
                                             max_length=50,
@@ -94,9 +101,6 @@ def list_posts(title: Optional[str] = Query(default=None,
         direction: Literal["asc", "desc"] = Query(default="asc")
 ):
 
-    print(
-        f"title {title}, limit {limit}, offset {offset}, order_by {order_by}, direction {direction}")
-
     results = BLOG_POSTS
 
     if title:
@@ -104,10 +108,18 @@ def list_posts(title: Optional[str] = Query(default=None,
             post for post in results if title.lower() in post.title.lower()
         ]
 
+    total = len(results)
+
     results = sorted(
         results, key=lambda post: post.id if order_by == "id" else post.title, reverse=(direction == "desc"))
 
-    return results[offset: offset + limit]
+    items = results[offset: offset + limit]
+
+    return PaginatedPost(
+        total=total,
+        limit=limit,
+        offset=offset,
+        items=items)
 
 
 @app.get("/posts/{post_id}", response_model=Union[PostPublic, PostSummary])
