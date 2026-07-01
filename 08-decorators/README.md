@@ -1,5 +1,7 @@
 # Python Decorators
 
+## Functions in Python
+
 In Python, functions are `first-class citizes`, that means they are just variables.
 
 ```python
@@ -27,3 +29,17 @@ print(a())
 ```
 
 `Decorators` work because of this characteristic of functions being first-class citizens. Decorators modify our functions adding extra capabilities for them.
+
+## High Order Function (HOC)
+
+A HOC is a function that accepts another function as a parameter or, a function that returns another function
+
+```python
+def greet(fn):
+    fn()
+
+def hoc_fn():
+    def inner_fn():
+        # do something
+    return inner_fn
+```
