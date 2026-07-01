@@ -75,9 +75,15 @@ BLOG_POSTS: List[PostPublic] = [
 
 
 class PaginatedPost(BaseModel):
+    page: int
+    per_page: int
     total: int
-    limit: int
-    offset: int
+    total_pages: int
+    has_prev: bool
+    has_next: bool
+    order_by:  Literal["id", "title"]
+    direction: Literal["asc", "desc"]
+    search: Optional[str]
     items: List[PostPublic]
 
 
@@ -100,7 +106,6 @@ def list_posts(title: Optional[str] = Query(default=None,
         default="title", description="Order by id or title"),
         direction: Literal["asc", "desc"] = Query(default="asc")
 ):
-
     results = BLOG_POSTS
 
     if title:
@@ -108,7 +113,10 @@ def list_posts(title: Optional[str] = Query(default=None,
             post for post in results if title.lower() in post.title.lower()
         ]
 
-    total = len(results)
+    total = len(results)  # total 100, limit 10, offset 10, page = 2
+    total_pages = total // limit  # total_pages 10
+    page = (offset // total_pages) + 1 if total_pages != 0 else 0
+    per_page = limit
 
     results = sorted(
         results, key=lambda post: post.id if order_by == "id" else post.title, reverse=(direction == "desc"))
@@ -116,10 +124,17 @@ def list_posts(title: Optional[str] = Query(default=None,
     items = results[offset: offset + limit]
 
     return PaginatedPost(
+        page=page,
+        per_page=per_page,
         total=total,
-        limit=limit,
-        offset=offset,
-        items=items)
+        total_pages=total_pages,
+        has_prev=True,
+        has_next=True,
+        order_by=order_by,
+        direction=direction,
+        search=title,
+        items=items,
+    )
 
 
 @app.get("/posts/{post_id}", response_model=Union[PostPublic, PostSummary])
@@ -175,3 +190,35 @@ def delete_post(post_id: int):
             return
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND,
                         detail="Post not found")
+
+
+""" 
+{
+  "page": 2,
+  "per_page": 3,
+  "total": 8,
+  "total_pages": 3,
+  "has_prev": true,
+  "has_next": true,
+  "order_by": "title",
+  "direction": "asc",
+  "search": "fastapi",
+  "items": [
+    {
+      "id": 4,
+      "title": "FastAPI avanzado",
+      "content": "Ejemplo de post avanzado"
+    },
+    {
+      "id": 5,
+      "title": "FastAPI básico",
+      "content": "Ejemplo de post básico"
+    },
+    {
+      "id": 6,
+      "title": "FastAPI con seguridad",
+      "content": "Post sobre seguridad con FastAPI"
+    }
+  ]
+}
+"""
