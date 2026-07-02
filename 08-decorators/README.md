@@ -43,3 +43,28 @@ def hoc_fn():
         # do something
     return inner_fn
 ```
+
+## Decorators
+
+Decorators are functions wrapping another function, like a HOC.
+
+```python
+def my_decorator(fn):
+    def wrap_fn():
+        print("Print from decorator")
+        print("****")
+        fn()
+        print("****")
+
+    return wrap_fn
+
+@my_decorator
+def hello():
+    print("Hello!!!")
+
+@my_decorator
+def bye()
+    print("See you later")
+
+hello()
+```
