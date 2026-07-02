@@ -18,9 +18,11 @@ else:
 Number = int | float
 
 
-def sum(num1: Number, num2: Number) -> Number:
+def sum(num1: Number, num2: Number) -> Number | None:
     try:
         return num1 + num2
     except TypeError as err:
         print("Please use just numbers")
         raise TypeError(f"{err}")
+    except (ValueError, ZeroDivisionError):  # Handling multiple errors
+        print("Avoid using 0")
