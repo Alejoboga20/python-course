@@ -1,5 +1,13 @@
-class CustomException(Exception):
-    pass
+age = input("What's your age? ")
 
-
-raise CustomException("Something went wrong")
+try:
+    age = int(age)
+    # 10 / age
+    print(f"Age: {age}")
+except ValueError:
+    print("Please enter a number")
+    # raise ValueError("Please enter a number")
+except ZeroDivisionError:
+    print("Age can not be zeo")
+else:
+    print("Thanks")
